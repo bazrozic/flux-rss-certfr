@@ -116,8 +116,12 @@ def main():
     check_alerts()
 
 if __name__ == "__main__":
+    # Récupérer le port depuis les variables d'environnement (Render fournit PORT)
+    port = int(os.getenv('PORT', 5000))
+    
     # En mode développement, lancer directement le script
     if os.getenv('FLASK_ENV') == 'development':
-        flask_app.run(debug=True)
+        flask_app.run(debug=True, host='0.0.0.0', port=port)
     else:
-        main()
+        # Pour le déploiement, démarrer le serveur Flask
+        flask_app.run(host='0.0.0.0', port=port)
