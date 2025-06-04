@@ -1,0 +1,7 @@
+feedparser
+requests
+os
+json
+time
+python-dotenv
+flask

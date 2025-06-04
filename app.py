@@ -4,9 +4,13 @@ import os
 import json
 import time
 from dotenv import load_dotenv
+from flask import Flask
 
 # Charger les variables d'environnement
 load_dotenv()
+
+# Créer l'application Flask
+flask_app = Flask(__name__)
 
 # URL du flux RSS CERT-FR
 RSS_URL = "https://www.cert.ssi.gouv.fr/feed"
@@ -54,7 +58,8 @@ def send_to_discord(webhook_url, title, link, published):
             print(f"Erreur en envoyant sur Discord: {response.status_code}, {response.text}")
             return
 
-def main():
+def check_alerts():
+    """Fonction principale pour vérifier et envoyer les alertes"""
     cache = load_cache()
     print(f"Cache contient {len(cache)} alertes sauvegardées.")
 
@@ -88,9 +93,31 @@ def main():
         cache.extend(new_alerts)
         save_cache(cache)
         print(f"{len(new_alerts)} nouvelles alertes envoyées.")
+        return f"{len(new_alerts)} nouvelles alertes envoyées."
     else:
         print("Pas de nouvelles alertes.")
+        return "Pas de nouvelles alertes."
 
+@flask_app.route("/")
+def trigger_alerts():
+    """Endpoint pour déclencher la vérification des alertes"""
+    try:
+        result = check_alerts()
+        return f"OK - {result}"
+    except Exception as e:
+        return f"Erreur: {str(e)}", 500
+
+@flask_app.route("/health")
+def health_check():
+    """Endpoint de santé pour vérifier que l'API fonctionne"""
+    return "Service actif"
+
+def main():
+    check_alerts()
 
 if __name__ == "__main__":
-    main()
+    # En mode développement, lancer directement le script
+    if os.getenv('FLASK_ENV') == 'development':
+        flask_app.run(debug=True)
+    else:
+        main()
