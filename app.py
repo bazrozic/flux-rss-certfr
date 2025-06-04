@@ -3,12 +3,16 @@ import requests
 import os
 import json
 import time
+from dotenv import load_dotenv
+
+# Charger les variables d'environnement
+load_dotenv()
 
 # URL du flux RSS CERT-FR
 RSS_URL = "https://www.cert.ssi.gouv.fr/feed"
 
 # URL du webhook Discord (à remplacer par ta propre URL)
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1379737836978442290/WNGqqclvUZ_a3QfiLkU3wvOM5Eb31D4T7rNcMYS1m1SQMkH-16Woz8kd2JWATpmAzNAG"
+DISCORD_WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 
 # Fichier local pour mémoriser les alertes déjà envoyées
 CACHE_FILE = "alertes_certfr_cache.json"
